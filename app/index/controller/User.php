@@ -73,6 +73,24 @@ class User extends Base
     }
 
 
+    public function SetUserInfo($city, $country, $gender, $nickname, $province,$openid)
+    {
+        $info=[
+          'city'=>$city,
+          'country'=>$country,
+          'gender'=>$gender,
+          'nickname'=>$nickname,
+          'province'=>$province,
+        ];
+        $res=Db::name('user')->where('openid',$openid)->update($info);
+        if ($res!==false){
+            return $this->asuccess('添加个人信息成功');
+        }else{
+            return $this->aerror('添加个人信息失败');
+        }
+    }
+
+
 
     
 }
