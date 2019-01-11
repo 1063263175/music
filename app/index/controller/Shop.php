@@ -13,6 +13,21 @@ use think\Db;
 
 class Shop extends Base
 {
+    /**
+     * 添加订单
+     * @param $user_id
+     * @param $music_id
+     * @param $vip
+     * @param int $number
+     * @param $money
+     * @param $link_name
+     * @param $link_tel
+     * @param $link_addressed
+     * @param $link_wechat
+     * @return \think\response\Json
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
     public function SetOrder($user_id, $music_id, $vip, $number = 1, $money,$link_name,$link_tel,$link_addressed,$link_wechat)
     {
         //余票数量
@@ -29,7 +44,7 @@ class Shop extends Base
             'music_id'=>$music_id,
             'vip'=>$vip,
             'number'=>$number,
-            'money'=>$money*$number,
+            'money'=>$money,
             'add_time'=>time(),
             'link_name'=>$link_name,
             'link_tel'=>$link_tel,
@@ -44,7 +59,6 @@ class Shop extends Base
         }else{
             return $this->aerror('订单失败');
         }
-
-
     }
+
 }

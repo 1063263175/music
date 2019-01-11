@@ -107,6 +107,29 @@ class User extends Base
         }
     }
 
+    /**
+     * 获取用户订单
+     * @param $user_id
+     * @param $page
+     * @param $pagelimit
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function GetUserOrder($user_id,$page,$pagelimit)
+    {
+        $list=Db::name('order')
+            ->alias('or')
+            ->join('tplay_music tm','or.music_id=tm.music_id','left')
+            ->where('or.user_id',$user_id)
+            ->order('or.add_time','desc')
+            ->field('or.*,tm.name,tm.time,tm.end_time,tm.description,tm.thumb_path,tm.site')
+            ->page($page,$pagelimit)
+            ->select();
+        return json($list);
+    }
+
 
 
     

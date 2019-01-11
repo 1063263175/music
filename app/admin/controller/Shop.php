@@ -9,6 +9,8 @@
 namespace app\admin\controller;
 
 use app\admin\controller\Permissions;
+use think\Db;
+
 class Shop extends Permissions
 {
     public function choujiang()
@@ -23,6 +25,8 @@ class Shop extends Permissions
 
     public function order()
     {
-        
+        $list=Db::name('order')->paginate('20');
+        $this->assign('list',$list);
+        return $this->fetch();
     }
 }
