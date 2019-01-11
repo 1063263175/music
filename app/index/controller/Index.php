@@ -83,6 +83,11 @@ class Index extends Base
             foreach ($list as $k=>$v){
                 $zan=GetMusicGood($user_id,$v['music_id'],1);
                 $cang=GetMusicGood($user_id,$v['music_id'],2);
+                //获取评论数量
+                //dump($this->GetCommentCount($v['music_id']));die;
+                $list[$k]['comment_count']=$this->GetCommentCount($v['music_id'],'0');
+                //获取前三条评论
+                $list[$k]['comment_list']=$this->GetCommentList($v['music_id'],1,3,'0');
                 if (empty($zan)){
                     $list[$k]['is_zan']=0;
                 }else{
@@ -251,14 +256,21 @@ class Index extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetCommentList($music_id,$page='1',$limit='20')
+    public function GetCommentList($music_id,$page='1',$limit='20',$is_json=1)
     {
         $list=Db::name('comment')
-            ->where('music_id',$music_id)
-            ->where('status',1)
+            ->alias('co')
+            ->join('tplay_user us','us.user_id = co.user_id','left')
+            ->where('co.music_id',$music_id)
+            ->where('co.status',1)
             ->page($page,$limit)
             ->select();
-        return json($list);
+        if ($is_json == 1){
+            return json($list);
+        }else{
+            return $list;
+        }
+
     }
 
     /**
@@ -267,13 +279,18 @@ class Index extends Base
      * @return \think\response\Json
      * @throws \think\Exception
      */
-    public function GetCommentCount($music_id)
+    public function GetCommentCount($music_id,$is_json=1)
     {
         $num=Db::name('comment')
             ->where('music_id',$music_id)
             ->where('status',1)
             ->count('id');
-        return json(['count'=>$num]);
+        if ($is_json == 1){
+            return json(['count'=>$num]);
+        }else{
+            return ['count'=>$num];
+        }
+
     }
 
     /**

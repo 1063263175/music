@@ -34,10 +34,15 @@ class User extends Base
         curl_close($curl);
         //dump(json_decode($res, true));
         $res=json_decode($res, true);
+
+        //$res['openid']=21121;
         if (!empty($res['openid'])){
             $user=Db::name('user')->where('openid',$res['openid'])->field('user_id')->find();
             if (empty($user)){
                 $user['user_id']=Db::name('user')->insertGetId(['openid'=>$res['openid']]);
+                $res['set_user_info']=1;
+            }else{
+                $res['set_user_info']=0;
             }
             $res['user_id']=$user['user_id'];
         }
@@ -73,14 +78,26 @@ class User extends Base
     }
 
 
+    /**
+     * 插入个人信息
+     * @param $city
+     * @param $country
+     * @param $gender
+     * @param $nickname
+     * @param $province
+     * @param $openid
+     * @return \think\response\Json
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
     public function SetUserInfo($city, $country, $gender, $nickname, $province,$openid)
     {
         $info=[
-          'city'=>$city,
-          'country'=>$country,
-          'gender'=>$gender,
-          'nickname'=>$nickname,
-          'province'=>$province,
+            'city'=>$city,
+            'country'=>$country,
+            'gender'=>$gender,
+            'nickname'=>$nickname,
+            'province'=>$province,
         ];
         $res=Db::name('user')->where('openid',$openid)->update($info);
         if ($res!==false){

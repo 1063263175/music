@@ -11,5 +11,18 @@ namespace app\admin\controller;
 use app\admin\controller\Permissions;
 class Shop extends Permissions
 {
+    public function choujiang()
+    {
+        
+    }
 
+    public function cjpublish()
+    {
+        
+    }
+
+    public function order()
+    {
+        
+    }
 }

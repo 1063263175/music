@@ -84,13 +84,13 @@ class Article extends Base
         ]);
         //验证部分数据合法性
         if (!$validate->check($post)) {
-            $this->error('提交失败：' . $validate->getError());
+            $this->aerror('提交失败：' . $validate->getaerror());
         }
         $post['add_time']=time();
         if (Db::name('article_comment')->insert($post)>0){
-            return $this->success('评论成功');
+            return $this->asuccess('评论成功');
         }else{
-            return $this->error('评论失败');
+            return $this->aerror('评论失败');
         }
     }
 
@@ -135,16 +135,16 @@ class Article extends Base
         if ($status == 0){
             //取消
             if (Db::name('article_good')->where($info)->delete()!==false){
-                return $this->success('取消成功');
+                return $this->asuccess('取消成功');
             }else{
-                return $this->error('取消失败');
+                return $this->aerror('取消失败');
             }
         }else{
             //加入
             if (Db::name('article_good')->insert($info)>0){
-                return $this->success('添加成功');
+                return $this->asuccess('添加成功');
             }else{
-                return $this->error('添加失败');
+                return $this->aerror('添加失败');
             }
         }
     }
@@ -181,6 +181,14 @@ class Article extends Base
         return json($list);
     }
 
+    /**
+     * 获取咨询评论详情
+     * @param $comment_id
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function GetArticleCommentInfo($comment_id)
     {
         $info=Db::name('article_good')->where('id',$comment_id)->find();
