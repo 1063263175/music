@@ -49,6 +49,7 @@ class Music extends Permissions
                 /*$post['money']=$post['money']*100;
                 $post['vip_money']=$post['vip_money']*100;*/
                 $post['time']=strtotime($post['time']);
+                $post['end_time']=strtotime($post['end_time']);
                 if(false == $model->allowField(true)->save($post,['music_id'=>$id])) {
                     return $this->error('修改失败');
                 } else {

@@ -25,7 +25,7 @@ class Shop extends Permissions
 
     public function order()
     {
-        $list=Db::name('order')->paginate('20');
+        $list=Db::name('order')->order('order_id','desc')->paginate('20');
         $this->assign('list',$list);
         return $this->fetch();
     }

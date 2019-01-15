@@ -63,13 +63,14 @@ class User extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetCangList($user_id, $class = 2, $page = 1, $pagelimit = 20, $sort = 'id', $desc = 'desc')
+    public function GetCangList($music_class=1,$user_id, $class = 2, $page = 1, $pagelimit = 20, $sort = 'id', $desc = 'desc')
     {
         $list=Db::name('good')
             ->alias('gd')
             ->join('tplay_music mu','gd.music_id=mu.music_id','left')
             ->where('gd.user_id',$user_id)
             ->where('gd.class',$class)
+            ->where('mu.class',$music_class)
             ->field('mu.*,gd.user_id')
             ->order($sort,$desc)
             ->page($page,$pagelimit)
@@ -132,7 +133,49 @@ class User extends Base
     }
 
 
+    /**
+     * 修改头像
+     * @param $user_id
+     * @param $head_img
+     * @return \think\response\Json
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public function UpdateHeadImg($user_id, $head_img)
+    {
+        $res=Db::name('user')->where('user_id',$user_id)->update(['head_img'=>$head_img]);
+        if ($res>0){
+            return $this->asuccess('修改成功');
+        }else{
+            return $this->aerror('修改失败');
+        }
+    }
 
+
+    /**
+     * 意见反馈
+     * @return \think\response\Json
+     */
+    public function SetFankui()
+    {
+        $post['user_id']=$this->request->post('user_id');
+        $post['fankui']=$this->request->post('fankui');
+        $post['add_time']=time();
+        $res=Db::name('fankui')->insertGetId($post);
+        if ($res>0){
+            return $this->asuccess('反馈成功');
+        }else{
+            return $this->aerror('反馈失败');
+        }
+    }
+
+    /**
+     * @param string $openid
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function GetUserInfo($openid='')
     {      
       if($openid){
