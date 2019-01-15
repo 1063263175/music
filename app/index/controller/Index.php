@@ -65,11 +65,10 @@ class Index extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetMusicPageList($user_id='',$class=1,$page = "1", $limit = "20",$is_top="0", $sort = "mu.music_id", $desc = "desc")
+    public function GetMusicPageList($user_id=0,$class=1,$page = "1", $limit = "20",$is_top="0", $sort = " mu.music_id ", $desc = "desc")
     {
-        if (empty($user_id)){
-            return $this->aerror('user_id为空');
-        }else{
+       
+        
             $where=[
                 'mu.is_top'=>$is_top,
                 'mu.class'=>$class
@@ -102,7 +101,7 @@ class Index extends Base
 
             //dump($list);
             return json($list);
-        }
+       
 
     }
 
@@ -256,7 +255,7 @@ class Index extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetCommentList($music_id,$page='1',$limit='20',$is_json=1)
+    public function GetCommentList($music_id=0,$page='1',$limit='20',$is_json=1)
     {
         $list=Db::name('comment')
             ->alias('co')
@@ -290,7 +289,6 @@ class Index extends Base
         }else{
             return ['count'=>$num];
         }
-
     }
 
     /**
@@ -343,7 +341,7 @@ class Index extends Base
             return json($res);
         } else {
             // 上传失败获取错误信息
-            return $this->error('上传失败：'.$file->getError());
+            return $this->aerror('上传失败：'.$file->getError());
         }
     }
 

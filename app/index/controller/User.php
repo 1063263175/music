@@ -90,7 +90,7 @@ class User extends Base
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    public function SetUserInfo($city, $country, $gender, $nickname, $province,$openid)
+    public function SetUserInfo($city, $country, $gender, $nickname, $province,$openid,$head_img)
     {
         $info=[
             'city'=>$city,
@@ -98,6 +98,7 @@ class User extends Base
             'gender'=>$gender,
             'nickname'=>$nickname,
             'province'=>$province,
+            'head_img'=>$head_img,
         ];
         $res=Db::name('user')->where('openid',$openid)->update($info);
         if ($res!==false){
@@ -117,7 +118,7 @@ class User extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetUserOrder($user_id,$page,$pagelimit)
+    public function GetUserOrder($user_id,$page=1,$pagelimit=20)
     {
         $list=Db::name('order')
             ->alias('or')
@@ -132,5 +133,20 @@ class User extends Base
 
 
 
+    public function GetUserInfo($openid='')
+    {      
+      if($openid){
+        $list=Db::name('user')
+            ->where('openid',$openid)
+            ->find();
+        if(!$list){
+           $list['status']="openid 不存在";
+        }
+        return json($list);
+      }else{
+        $list['status']="openid 为空";
+         return json($list);
+      }
+    }
     
 }

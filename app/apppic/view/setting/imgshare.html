@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>QiYeTool</title>
+<style>
+.header {
+	height: 80px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 50px;
+	color: #ffffff;
+	width: auto;
+	background-color: #6bc2fc;
+	line-height: 80px;
+}
+
+a:link { 
+    text-decoration: none;
+    color: blue
+}
+
+.body{
+	height: 40px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 16px;
+	color: #ffffff;
+	width: 32%;
+	background-color: #0099ff;
+	line-height: 40px;
+	margin-top:5%;
+	margin-left:34%; 
+}
+
+
+</style>
+</head>
+<body>
+    <div class="header">图片分享APP</div>
+                    {notempty name='share'}
+                        {volist name='share' id='vo'}
+                        <div style="padding-top:100px;text-align: center;">
+                            <a href="#">
+                                <img src="http://pic.appudid.cn/{$vo.img_src}" alt="{$vo.group_title}" width="100%"height='auto'>
+                                <h1>{$vo.group_title}</h3>
+                            </a>
+                            
+                        </div>
+                        {/volist}
+                    {/notempty}
+</body>
+
+</html>

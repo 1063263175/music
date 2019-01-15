@@ -172,7 +172,7 @@ class Article extends Base
         ];
         $list=Db::name('article_good')
             ->alias('ag')
-            ->join('tplay_article as ta','ta.id=ag.article_id','left')
+            ->join('tplay_article ta','ta.id=ag.article_id','left')
             ->where($where)
             ->page($page,$pagelimit)
             ->order($sort,$desc)

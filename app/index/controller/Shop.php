@@ -35,11 +35,7 @@ class Shop extends Base
         if ($yp>0&&$yp >= $number){
             $yp=$yp-$number;
             Db::name('music')->where('music_id',$music_id)->update(['number'=>$yp]);
-        }else{
-            return $this->aerror('余票不足');
-        }
-
-        $info=[
+           $info=[
             'user_id'=>$user_id,
             'music_id'=>$music_id,
             'vip'=>$vip,
@@ -55,10 +51,46 @@ class Shop extends Base
         $res=Db::name('order')->insertGetId($info);
 
         if ($res>0){
-            return $this->asuccess('订单成功',['order_id'=>$res]);
+            $data['status']='订单成功';
+            $data['order_id']=$res;
         }else{
-            return $this->aerror('订单失败');
+           $data['status']='订单失败';
+            $data['order_id']=0;  
+          
+         }                
+          
+          
+        }else{
+           
+           $data['status']='余票不足';
+            $data['order_id']=0;
         }
+
+       
+       return  json($data);
+    }
+
+    /**
+     * 音乐节参与会员
+     * @param $music_id
+     * @param int $page
+     * @param int $pagelimit
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function GetMusicUserList($music_id, $page = 1, $pagelimit = 20)
+    {
+        $list=Db::name('order')
+            ->alias('or')
+            ->join('tplay_user','or.user_id = tplay_user.user_id','right')
+            ->where('or.music_id',$music_id)
+            ->where('is_pay',1)
+            ->order('pay_time','desc')
+            ->page($page,$pagelimit)
+            ->select();
+        return json($list);
     }
 
 }
