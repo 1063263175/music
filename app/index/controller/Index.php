@@ -338,7 +338,9 @@ class Index extends Base
             $res['id'] = Db::name('attachment')->insertGetId($data);
             $res['src'] = DS . 'uploads' . DS . $module . DS . $use . DS . $info->getSaveName();
             $res['code'] = 2;
-            return json($res);
+            //header('Content-Type:application/json');//这个类型声明非常关键
+            //return json_encode($res);
+            return $res['src'];
         } else {
             // 上传失败获取错误信息
             return $this->aerror('上传失败：'.$file->getError());

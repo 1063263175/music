@@ -109,7 +109,9 @@ class Article extends Base
     public function GetArticleCommentPageList($article_id, $page = 1, $pagelimit = 20, $sort = "id", $desc = "desc")
     {
         $list=Db::name('article_comment')
-            ->where('article_id',$article_id)
+            ->alias('ac')
+            ->join('tplay_user tu','tu.user_id = ac.user_id','left')
+            ->where('ac.article_id',$article_id)
             ->order($sort,$desc)
             ->page($page,$pagelimit)
             ->select();
