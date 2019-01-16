@@ -36,12 +36,6 @@ class User extends Permissions
                 //是提交操作
                 $post = $this->request->post();
 
-                //验证菜单是否存在
-                $article = Db::name('user')->where('user_id',$id)->find();
-                if(empty($article)) {
-                    return $this->error('id不正确');
-                }
-
                 if(false == Db::name('user')->update($post,['id'=>$id])) {
                     return $this->error('修改失败');
                 } else {
