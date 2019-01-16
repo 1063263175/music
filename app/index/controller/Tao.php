@@ -22,11 +22,11 @@ class Tao extends Base
      * @param string $img
      * @return \think\response\Json
      */
-    public function SetTaoInfo($user_id, $music_id, $title, $content, $vedio = '', $img = '')
+    public function SetTaoInfo($user_id, $title, $content, $vedio = '', $img = '')
     {
         $info=[
             'user_id'=>$user_id,
-            'music_id'=>$music_id,
+            //'music_id'=>$music_id,
             'title'=>$title,
             'content'=>$content,
             'vedio'=>$vedio,
@@ -51,19 +51,19 @@ class Tao extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetTaoList($user_id = '', $music_id = '', $page = 1, $pagelimit = 20)
+    public function GetTaoList($user_id = '', $page = 1, $pagelimit = 20)
     {
         $where=[
             'user_id'=>$user_id,
-            'music_id'=>$music_id,
+            //'music_id'=>$music_id,
         ];
         $limit=Db::name('tao')
             ->alias('tt')
             ->join('tplay_user tu','tu.user_id=tt.user_id','left')
-            ->join('tplay_music tm','tm.music_id=tt.music_id','left')
+           // ->join('tplay_music tm','tm.music_id=tt.music_id','left')
             ->where($where)
             ->order('tao_id','desc')
-            ->field('tt.*,tu.nickname,tu.head_img,tm.name as music_name,tm.thumb_path as music_img,tm.time,tm.end_time,tm.money,tm.vip_money,tm.number as music_number')
+            ->field('tt.*,tu.nickname,tu.head_img')
             ->page($page,$pagelimit)
             ->select();
         return json($limit);

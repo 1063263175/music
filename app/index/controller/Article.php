@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpParamsInspection */
+
 namespace app\index\controller;
 
 use app\index\controller\Base;
@@ -50,6 +51,7 @@ class Article extends Base
     public function GetArticlePageList($cate_id, $page = 1, $pagelimit = 20, $sort = 'id', $desc = 'desc')
     {
         $list=Db::name('article')
+            ->where('status',1)
             ->where('article_cate_id',$cate_id)
             ->page($page,$pagelimit)
             ->order($sort,$desc)
@@ -169,6 +171,7 @@ class Article extends Base
     {
         $where=[
             'class'=>$class,
+
             //'article_id'=>$article_id,
             'user_id'=>$user_id,
         ];
@@ -196,5 +199,43 @@ class Article extends Base
         $info=Db::name('article_good')->where('id',$comment_id)->find();
         return json($info);
     }
+
+    /**
+     * 发布投稿   投稿页是向资讯-热门推文那里的投的，后台审核
+     * @return \think\response\Json
+     */
+    public function SetArticleInfo()
+    {
+        
+        $model=new \app\admin\model\Article();
+        //是新增操作
+        if($this->request->isPost()) {
+            //是提交操作
+            $post = $this->request->post();
+            //验证  唯一规则： 表名，字段名，排除主键值，主键名
+            $validate = new \think\Validate([
+                ['title', 'require', '标题不能为空'],
+                ['user_id','require','用户id不能为空'],
+                ['music_id','require','音乐节id不能为空'],
+                //['article_cate_id', 'require', '请选择分类'],
+                ['content', 'require', '文章内容不能为空'],
+            ]);
+            //验证部分数据合法性
+            if (!$validate->check($post)) {
+                $this->error('提交失败：' . $validate->getError());
+            }
+            $post['article_cate_id']=4;
+            $post['create_time']=time();
+            $post['update_time']=time();
+            if(false == $model->allowField(true)->save($post)) {
+                return $this->aerror('添加失败');
+            } else {
+                return $this->asuccess('添加成功,等待审核');
+            }
+        }else{
+            return $this->aerror('用post提交');
+        }
+    }
+
 
 }
