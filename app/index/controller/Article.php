@@ -48,7 +48,7 @@ class Article extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetArticlePageList($cate_id, $page = 1, $pagelimit = 20, $sort = 'id', $desc = 'desc')
+    public function GetArticlePageList($user_id, $cate_id, $page = 1, $pagelimit = 20, $sort = 'id', $desc = 'desc')
     {
         $list=Db::name('article')
             ->where('status',1)
@@ -56,6 +56,35 @@ class Article extends Base
             ->page($page,$pagelimit)
             ->order($sort,$desc)
             ->select();
+        $where=[
+            'user_id'=>$user_id,
+        ];
+        foreach ($list as $k=>$v){
+            $where['article_id']=$v['id'];
+            $where['class']=1;
+            $zan=Db::name('article_good')->where($where)->find();
+            $where['class']=2;
+            $cang=Db::name('article_good')->where($where)->find();
+            if (empty($zan)){
+                $list[$k]['is_zan']=0;
+            }else{
+                $list[$k]['is_zan']=1;
+            }
+            if (empty($cang)){
+                $list[$k]['is_cang']=0;
+            }else{
+                $list[$k]['is_cang']=1;
+            }
+
+            $list[$k]['comment_count']=Db::name('article_comment')
+                ->where('article_id',$v['id'])
+                ->count('id');
+            $list[$k]['zan_count']=Db::name('article_good')
+                ->where(['article_id'=>$v['id'],'class'=>1])
+                ->count('id');
+
+
+        }
         return json($list);
     }
 
@@ -86,7 +115,7 @@ class Article extends Base
         ]);
         //验证部分数据合法性
         if (!$validate->check($post)) {
-            $this->aerror('提交失败：' . $validate->getaerror());
+            $this->aerror('提交失败：' . $validate->geterror());
         }
         $post['add_time']=time();
         if (Db::name('article_comment')->insert($post)>0){
@@ -206,7 +235,7 @@ class Article extends Base
      */
     public function SetArticleInfo()
     {
-        
+
         $model=new \app\admin\model\Article();
         //是新增操作
         if($this->request->isPost()) {
@@ -236,6 +265,24 @@ class Article extends Base
             return $this->aerror('用post提交');
         }
     }
+
+    /**
+     * 获取music_id
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function GetMusicId()
+    {
+        $list=Db::name('music')
+            ->order('music_id','desc')
+            ->field('name,music_id')
+            ->select();
+        return json($list);
+    }
+
+    
 
 
 }

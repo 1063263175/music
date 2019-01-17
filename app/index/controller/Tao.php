@@ -13,7 +13,8 @@ use think\Db;
 
 class Tao extends Base
 {
-    /**发布淘票
+    /**
+     * 发布淘票
      * @param $user_id
      * @param $music_id
      * @param $title
@@ -41,7 +42,8 @@ class Tao extends Base
         }
     }
 
-    /**淘票列表
+    /**
+     * 淘票列表
      * @param string $user_id
      * @param string $music_id
      * @param int $page
@@ -60,7 +62,7 @@ class Tao extends Base
         $limit=Db::name('tao')
             ->alias('tt')
             ->join('tplay_user tu','tu.user_id=tt.user_id','left')
-           // ->join('tplay_music tm','tm.music_id=tt.music_id','left')
+            //->join('tplay_music tm','tm.music_id=tt.music_id','left')
             ->where($where)
             ->order('tao_id','desc')
             ->field('tt.*,tu.nickname,tu.head_img')

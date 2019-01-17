@@ -60,6 +60,10 @@ function GetMusicName($music_id)
 {
     return \think\Db::name('music')->where('music_id',$music_id)->value('name');
 }
+function GetQuanName($music_id)
+{
+    return \think\Db::name('quan')->where('quan_id',$music_id)->value('title');
+}
 /**
  * @param $music_id
  * @return mixed
@@ -67,6 +71,18 @@ function GetMusicName($music_id)
 function GetArticleName($music_id)
 {
     return \think\Db::name('article')->where('id',$music_id)->value('title');
+}
+
+/**
+ * @param $user_id
+ * @return array|false|PDOStatement|string|\think\Model
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
+ */
+function GetUserInfo($user_id)
+{
+    return \think\Db::name('user')->where('user_id',$user_id)->find();
 }
 
 

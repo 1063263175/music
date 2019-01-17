@@ -16,7 +16,7 @@ class Hudong extends Base
 {
 
     /**
-     * 发布我的投稿
+     * 发布朋友圈
      * @return \think\response\Json
      */
     public function SetQuan()
@@ -27,6 +27,7 @@ class Hudong extends Base
         }elseif (empty($post['content'])){
             return $this->aerror('内容为空');
         }
+        $post['add_time']=time();
         $res=Db::name('quan')->insertGetId($post);
         if ($res>0){
             return $this->asuccess('发布成功');
@@ -49,8 +50,10 @@ class Hudong extends Base
     public function GetQuanList($user_id,$page=1, $pageLimit=20)
     {
         $list=Db::name('quan')
+            ->alias('qu')
+            ->join('tplay_user tu','qu.user_id=tu.user_id','left')
             ->page($page,$pageLimit)
-            ->order('quan_id','desc')
+            ->order('qu.quan_id','desc')
             ->select();
         foreach ($list as $k=>$v){
             $cang=Db::name('quan_good')->where('class',2)->where('user_id',$user_id)->find();
@@ -96,21 +99,138 @@ class Hudong extends Base
             'user_id'=>$user_id,
             'quan_id'=>$quan_id,
             'class'=>$class,
-            'time'=>time(),
         ];
         if (!$vali->check($info)) {
             $this->aerror('提交失败：' . $vali->getError());
         }
+        $find=Db::name('quan_good')->where($info)->find();
         if ($status == 0){
-            $res=Db::name('quan_good')->delete($info);
+            $res=Db::name('quan_good')->where($info)->delete();
         }elseif ($status == 1){
+            if (!empty($find)){
+                return $this->aerror('已存在');
+            }
+            $info['time']=time();
             $res=Db::name('quan_good')->insertGetId($info);
         }
-
         if ($res>0){
             return $this->asuccess('提交成功');
         }else{
             return $this->aerror('提交失败');
         }
     }
+
+    /**
+     * 朋友圈详情
+     * @param $quan_id
+     * @return \think\response\Json
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function GetQuanInfo($quan_id)
+    {
+        //点击量
+        Db::name('quan')->where('quan_id',$quan_id)->setInc('click');
+        $info=Db::name('quan')
+            ->alias('qu')
+            ->join('tplay_user as tu','tu.user_id=qu.user_id','left')
+            ->where('qu.quan_id',$quan_id)
+            ->find();
+        return json($info);
+    }
+
+    /**
+     * 添加朋友圈评论
+     * @param $user_id
+     * @param $quan_id
+     * @param $content
+     * @return \think\response\Json
+     */
+
+    public function SetQuanComment($user_id, $quan_id, $content)
+    {
+        $info=[
+            'user_id'=>$user_id,
+            'quan_id'=>$quan_id,
+            'content'=>$content,
+            'add_time'=>time(),
+        ];
+        $res=Db::name('quan_comment')->insertGetId($info);
+        if ($res>0){
+            return $this->asuccess('评论成功');
+        }else{
+            return $this->aerror('评论失败');
+        }
+    }
+
+    /**
+     * 获取朋友圈评论列表
+     * @param $quan_id
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+
+    public function GetQuanComment($quan_id)
+    {
+        $list=Db::name('quan_comment')
+            ->alias('qc')
+            ->join('tplay_user tu','tu.user_id=qc.user_id','left')
+            ->where('quan_id',$quan_id)
+            ->field('qc.*,tu.head_img,tu.nickname')
+            ->select();
+        return json($list);
+    }
+
+
+
+    /**
+     * 关注取关
+     * @param int $status 0取消关注1关注
+     * @param int $user_id  当前用户id
+     * @param int $buser_id  被关注用户id
+     * @return \think\response\Json
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public function SetGuan($status=1, $user_id, $buser_id)
+    {
+        $info=[
+            'user_id'=>$user_id,
+            'buser_id'=>$buser_id,
+        ];
+        $find=Db::name('guan')->where($info)->find();
+        if ($status == 1){
+            //关注
+            if (!empty($find)){
+                return $this->aerror('已经关注过了');
+            }else{
+                $info['add_time']=time();
+                $res=Db::name('guan')->insertGetId($info);
+                if ($res>0){
+                    return $this->asuccess('关注成功');
+                }else{
+                    return $this->aerror('关注失败');
+                }
+            }
+        }elseif ($status == 0){
+            //取消关注
+            if (empty($find)){
+                return $this->aerror('没有关注');
+            }else{
+                $res=Db::name('guan')->where($info)->delete();
+                if ($res !== false){
+                    return $this->asuccess('取消成功');
+                }else{
+                    return $this->aerror('取消失败');
+                }
+            }
+        }else{
+            return $this->aerror('参数错误');
+        }
+    }
+
 }

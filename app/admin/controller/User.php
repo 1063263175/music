@@ -57,4 +57,19 @@ class User extends Permissions
         }
 
     }
+
+    /**
+     * 淘票列表
+     * @return mixed
+     * @throws \think\exception\DbException
+     */
+    public function tao()
+    {
+        $list=Db::name('tao')
+            ->order('tao_id','desc')
+            ->paginate(20);
+        $this->assign('list',$list);
+        return $this->fetch();
+    }
+
 }

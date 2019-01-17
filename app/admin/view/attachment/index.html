@@ -59,7 +59,7 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>预览</th>
+          <!--<th>预览</th>-->
           <th>模块</th>
           <th>用途</th>
           <th>路径+名称</th>
@@ -79,7 +79,7 @@
         {volist name="attachment" id="vo"}
         <tr>
           <td>{$vo.id}</td>
-          <td>{if condition="$vo.fileext eq 'zip'"}<i class="fa fa-file"></i>{else /}<a href="{$vo.filepath}" class="tooltip"><img src="{$vo.filepath}" width="20" height="20"></a>{/if}</td>
+          <!--<td>{if condition="$vo.fileext eq 'zip'"}<i class="fa fa-file"></i>{else /}<a href="{$vo.filepath}" class="tooltip"><img src="{$vo.filepath}" width="20" height="20"></a>{/if}</td>-->
           <td>{$vo.module}</td>
           <td>{$vo.use}</td>
           <td>{$vo.filepath}</td>

@@ -85,6 +85,10 @@ class Index extends Base
                 //获取评论数量
                 //dump($this->GetCommentCount($v['music_id']));die;
                 $list[$k]['comment_count']=$this->GetCommentCount($v['music_id'],'0');
+                //获取点赞数量
+                $list[$k]['zan_count']=Db::name('good')
+                    ->where('music_id',$v['music_id'])
+                    ->count('music_id');
                 //获取前三条评论
                 $list[$k]['comment_list']=$this->GetCommentList($v['music_id'],1,3,'0');
                 if (empty($zan)){
