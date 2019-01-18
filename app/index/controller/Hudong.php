@@ -76,6 +76,11 @@ class Hudong extends Base
                 ->where('class',2)
                 ->where('quan_id',$v['quan_id'])
                 ->count('quan_id');
+            $list[$k]['comment_list']=Db::name('quan_comment')
+                ->where('quan_id',$v['quan_id'])
+                ->order('id','desc')
+                ->limit(4)
+                ->select();
         }
         return json($list);
     }
@@ -135,7 +140,7 @@ class Hudong extends Base
         Db::name('quan')->where('quan_id',$quan_id)->setInc('click');
         $info=Db::name('quan')
             ->alias('qu')
-            ->join('tplay_user as tu','tu.user_id=qu.user_id','left')
+            ->join('tplay_user','tplay_user.user_id=qu.user_id','left')
             ->where('qu.quan_id',$quan_id)
             ->find();
         return json($info);
@@ -180,6 +185,7 @@ class Hudong extends Base
             ->alias('qc')
             ->join('tplay_user tu','tu.user_id=qc.user_id','left')
             ->where('quan_id',$quan_id)
+            ->where('status',1)
             ->field('qc.*,tu.head_img,tu.nickname')
             ->select();
         return json($list);

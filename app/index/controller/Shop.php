@@ -93,4 +93,66 @@ class Shop extends Base
         return json($list);
     }
 
+
+    /**
+     * 获取用户抽奖次数
+     * @param $user_id
+     * @param $jiang_id
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function GetUserChou($user_id, $jiang_id)
+    {
+        $info=[
+            'user_id'=>$user_id,
+            'jiang_id'=>$jiang_id
+        ];
+        $res=Db::name('jianng_user')
+            ->where($info)
+            ->find();
+        if (empty($res)){
+            Db::name('jianng_user')
+                ->insert($info);
+            $res['chou_number']=1;
+        }
+        return json($res['chou_number']);
+    }
+
+
+    /**
+     * 添加用户的抽奖次数
+     * @param $user_id
+     * @param $jiang_id
+     * @param int $number
+     * @return \think\response\Json
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
+     */
+    public function SetUserChou($user_id, $jiang_id, $number = 1)
+    {
+        $info=[
+            'user_id'=>$user_id,
+            'jiang_id'=>$jiang_id,
+        ];
+        $res=Db::name('jianng_user')->where('$info')->find();
+        if (empty($res)){
+            $info['chou_number']=$number+1;
+            Db::name('jianng_user')->insert($info);
+            $num=$info['chou_number'];
+        }else{
+            $num=$number+$res['chou_number'];
+            $res=Db::name('jianng_user')->where($info)->update(['chou_number'=>$num]);
+        }
+        return json(['title'=>'剩余抽奖次数','num'=>$num]);
+    }
+
+
+
+
+
 }
