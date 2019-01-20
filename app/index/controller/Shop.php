@@ -54,7 +54,7 @@ class Shop extends Base
             $data['status']='订单成功';
             $data['order_id']=$res;
         }else{
-           $data['status']='订单失败';
+            $data['status']='订单失败';
             $data['order_id']=0;  
           
          }                
