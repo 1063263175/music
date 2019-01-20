@@ -14,7 +14,7 @@ use think\Db;
 class Shop extends Base
 {
     /**
-     * 添加订单1
+     * 添加订单
      * @param $user_id
      * @param $music_id
      * @param $vip
