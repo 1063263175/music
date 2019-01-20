@@ -239,4 +239,33 @@ class Hudong extends Base
         }
     }
 
+    /**
+     * 我关注的朋友圈
+     * @param $user_id
+     * @param int $page
+     * @param int $pagelimit
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function GetMyFriend($user_id, $page = 1, $pagelimit = 20)
+    {
+        $user_ids=Db::name('guan')->where('user_id',$user_id)->field('buser_id')->select();
+        foreach ($user_ids as $k=>$v){
+            $ids[$k]=$v['buser_id'];
+        }
+        //$ss=implode(',',$ids);
+        //dump($ss);die;
+        $where['qu.user_id']=['in',$ids];
+        $list=Db::name('quan')
+            ->alias('qu')
+            ->join('tplay_user tu','qu.user_id=tu.user_id','left')
+            ->where($where)
+            ->page($page,$pagelimit)
+            ->order('quan_id','desc')
+            ->select();
+        return json($list);
+    }
+
 }
