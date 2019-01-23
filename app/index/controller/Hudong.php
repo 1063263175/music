@@ -63,6 +63,12 @@ class Hudong extends Base
                 $list[$k]['is_cang']=1;
             }
             $zan=Db::name('quan_good')->where('class',1)->where('user_id',$user_id)->find();
+            $guan=Db::name('guan')->where('buser_id',$v['user_id'])->where('user_id',$user_id)->find();
+            if (empty($guan)){
+                $list[$k]['is_guan']=0;
+            }else{
+                $list[$k]['is_guan']=1;
+            }
             if (empty($zan)){
                 $list[$k]['is_zan']=0;
             }else{
@@ -84,6 +90,7 @@ class Hudong extends Base
         }
         return json($list);
     }
+
 
     /**
      * 加入取消点赞或收藏朋友圈
@@ -143,6 +150,21 @@ class Hudong extends Base
             ->join('tplay_user','tplay_user.user_id=qu.user_id','left')
             ->where('qu.quan_id',$quan_id)
             ->find();
+        //朋友圈的点赞数量
+        $info['zan_count']=Db::name('quan_good')
+            ->where('quan_id',$info['quan_id'])
+            ->where('user_id',$info['user_id'])
+            ->where('class',1)
+            ->count('id');
+        $info['cang_count']=Db::name('quan_good')
+            ->where('quan_id',$info['quan_id'])
+            ->where('user_id',$info['user_id'])
+            ->where('class',2)
+            ->count('id');
+        $info['comment_count']=Db::name('quan_comment')
+            ->where('quan_id',$info['quan_id'])
+            ->count('id');
+
         return json($info);
     }
 

@@ -75,6 +75,31 @@ class User extends Base
             ->order($sort,$desc)
             ->page($page,$pagelimit)
             ->select();
+
+        foreach ($list as $k=>$v){
+            $zan=GetMusicGood($user_id,$v['music_id'],1);
+            $cang=GetMusicGood($user_id,$v['music_id'],2);
+            //获取评论数量
+            //dump($this->GetCommentCount($v['music_id']));die;
+            $index=new \app\index\controller\Index();
+            $list[$k]['comment_count']=$index->GetCommentCount($v['music_id'],'0');
+            //获取点赞数量
+            $list[$k]['zan_count']=Db::name('good')
+                ->where('music_id',$v['music_id'])
+                ->count('music_id');
+            //获取前三条评论
+            $list[$k]['comment_list']=$index->GetCommentList($v['music_id'],1,3,'0');
+            if (empty($zan)){
+                $list[$k]['is_zan']=0;
+            }else{
+                $list[$k]['is_zan']=1;
+            }
+            if (empty($cang)){
+                $list[$k]['is_cang']=0;
+            }else{
+                $list[$k]['is_cang']=1;
+            }
+        }
         return json($list);
     }
 
@@ -190,6 +215,109 @@ class User extends Base
         $list['status']="openid 为空";
          return json($list);
       }
+    }
+
+    /**
+     * 我关注的
+     * @param $user_id
+     * @return mixed
+     */
+    public function GetUserList($user_id)
+    {
+        $list=Db::name('guan')
+            ->alias('gu')
+            ->join('tplay_user tu','tu.user_id=gu.user_id')
+            ->where('gu.buser_id',$user_id)
+            ->select();
+        return json($list);
+    }
+
+    /**
+     * 我发布的
+     * @param $user_id
+     * @return mixed
+     */
+    public function GetUserFabu($user_id)
+    {
+        $list=Db::name('quan')
+            ->where('user_id',$user_id)
+            ->select();
+        foreach ($list as $k=>$v){
+            $cang=Db::name('quan_good')->where('class',2)->where('user_id',$user_id)->find();
+            if (empty($cang)){
+                $list[$k]['is_cang']=0;
+            }else{
+                $list[$k]['is_cang']=1;
+            }
+            $zan=Db::name('quan_good')->where('class',1)->where('user_id',$user_id)->find();
+            $guan=Db::name('guan')->where('buser_id',$v['user_id'])->where('user_id',$user_id)->find();
+            if (empty($guan)){
+                $list[$k]['is_guan']=0;
+            }else{
+                $list[$k]['is_guan']=1;
+            }
+            if (empty($zan)){
+                $list[$k]['is_zan']=0;
+            }else{
+                $list[$k]['is_zan']=1;
+            }
+            $list[$k]['zan_count']=Db::name('quan_good')
+                ->where('class',1)
+                ->where('quan_id',$v['quan_id'])
+                ->count('quan_id');
+            $list[$k]['cang_count']=Db::name('quan_good')
+                ->where('class',2)
+                ->where('quan_id',$v['quan_id'])
+                ->count('quan_id');
+            $list[$k]['comment_list']=Db::name('quan_comment')
+                ->where('quan_id',$v['quan_id'])
+                ->order('id','desc')
+                ->limit(4)
+                ->select();
+        }
+        return json($list);
+    }
+
+    /**
+     * 我投稿的
+     * @param $user_id
+     * @return mixed
+     */
+    public function GetUserTg($user_id)
+    {
+        $list=Db::name('article')
+            ->where('user_id',$user_id)
+            ->select();
+        foreach ($list as $k=>$v){
+            $where=[
+                'user_id'=>$user_id,
+            ];
+            $where['article_id']=$v['id'];
+            $where['class']=1;
+            $zan=Db::name('article_good')->where($where)->find();
+            $where['class']=2;
+            $cang=Db::name('article_good')->where($where)->find();
+            if (empty($zan)){
+                $list[$k]['is_zan']=0;
+            }else{
+                $list[$k]['is_zan']=1;
+            }
+            if (empty($cang)){
+                $list[$k]['is_cang']=0;
+            }else{
+                $list[$k]['is_cang']=1;
+            }
+
+            $list[$k]['comment_count']=Db::name('article_comment')
+                ->where('article_id',$v['id'])
+                ->count('id');
+            $list[$k]['zan_count']=Db::name('article_good')
+                ->where(['article_id'=>$v['id'],'class'=>1])
+                ->count('id');
+
+
+        }
+        return json($list);
     }
     
 }

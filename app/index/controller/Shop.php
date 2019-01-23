@@ -54,7 +54,7 @@ class Shop extends Base
             $data['status']='订单成功';
             $data['order_id']=$res;
         }else{
-            $data['status']='订单失败';
+           $data['status']='订单失败';
             $data['order_id']=0;  
           
          }                
@@ -223,7 +223,7 @@ class Shop extends Base
      */
     public function RandCode()
     {
-        $code="ABCDEFGHIGKLMNOPQRSTUVWXYZ";
+        $code="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $rand=$code[rand(0,25)].strtoupper(dechex(date('m'))) .date('d').substr(time(),-5)  .substr(microtime(),2,5).sprintf('%02d',rand(0,99));
         for(
             $a = md5( $rand, true ),

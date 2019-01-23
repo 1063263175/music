@@ -144,7 +144,7 @@ class Tao extends Base
     {
         $list=Db::name('tao_comment')
             ->alias('tc')
-            ->join('tplay_user as tu','tu.user_id=tc.user_id','left')
+            ->join('tplay_user','tplay_user.user_id=tc.user_id','left')
             ->where('tc.tao_id',$tao_id)
             ->page($page,$pagelimit)
             ->select();
