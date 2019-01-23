@@ -48,10 +48,22 @@ class Article extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetArticlePageList($user_id, $cate_id, $page = 1, $pagelimit = 20, $sort = 'id', $desc = 'desc')
+    public function GetArticlePageList($keyword='',$year='',$user_id, $cate_id, $page = 1, $pagelimit = 20, $sort = 'id', $desc = 'desc')
     {
+        if (empty($keyword)){
+            $key='';
+        }else{
+            $key['title']=['like','%' . $keyword . '%'];
+        }
+        if (!empty($year)){
+            $ye['create_time']=['between time',[$year . '-1-1',$year . '-12-31']];
+        }else{
+            $ye='';
+        }
         $list=Db::name('article')
             ->where('status',1)
+            ->where($key)
+            ->where($ye)
             ->where('article_cate_id',$cate_id)
             ->page($page,$pagelimit)
             ->order($sort,$desc)
@@ -98,6 +110,8 @@ class Article extends Base
      */
     public function GetArticleInfo($id)
     {
+        //添加点击量
+        Db::name('article')->where('id',$id)->setInc('click');
         $info=Db::name('article')->where('id',$id)->find();
         return json($info);
     }

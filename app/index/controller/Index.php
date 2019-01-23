@@ -65,9 +65,18 @@ class Index extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetMusicPageList($user_id=0,$class=1,$page = "1", $limit = "20",$is_top="0", $sort = " mu.music_id ", $desc = "desc")
+    public function GetMusicPageList($keyword='',$year='',$user_id=0,$class=1,$page = "1", $limit = "20",$is_top="0", $sort = " mu.music_id ", $desc = "desc")
     {
-       
+            if (empty($keyword)){
+                $key='';
+            }else{
+                $key['mu.name']=['like','%' . $keyword . '%'];
+            }
+            if (!empty($year)){
+                $ye['mu.create_time']=['between time',[$year . '-1-1',$year . '-12-31']];
+            }else{
+                $ye='';
+            }
         
             $where=[
                 'mu.is_top'=>$is_top,
@@ -76,6 +85,8 @@ class Index extends Base
             $list = Db::name('music')
                 ->alias('mu')
                 ->where($where)
+                ->where($key)
+                ->where($ye)
                 ->order($sort,$desc)
                 ->page($page,$limit)
                 ->select();

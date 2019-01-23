@@ -62,8 +62,15 @@ class Hudong extends Base
             }else{
                 $list[$k]['is_cang']=1;
             }
-            $zan=Db::name('quan_good')->where('class',1)->where('user_id',$user_id)->find();
-            $guan=Db::name('guan')->where('buser_id',$v['user_id'])->where('user_id',$user_id)->find();
+            $zan=Db::name('quan_good')
+                ->where('class',1)
+                ->where('quan_id',$v['quan_id'])
+                ->where('user_id',$user_id)
+                ->find();
+            $guan=Db::name('guan')
+                ->where('buser_id',$v['user_id'])
+                ->where('user_id',$user_id)
+                ->find();
             if (empty($guan)){
                 $list[$k]['is_guan']=0;
             }else{

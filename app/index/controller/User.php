@@ -201,18 +201,18 @@ class User extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetUserInfo($openid='')
+    public function GetUserInfo($user_id='')
     {      
-      if($openid){
+      if($user_id){
         $list=Db::name('user')
-            ->where('openid',$openid)
+            ->where('user_id',$user_id)
             ->find();
         if(!$list){
-           $list['status']="openid 不存在";
+           $list['status']="id 不存在";
         }
         return json($list);
       }else{
-        $list['status']="openid 为空";
+        $list['status']="id 为空";
          return json($list);
       }
     }
@@ -239,42 +239,43 @@ class User extends Base
      */
     public function GetUserFabu($user_id)
     {
-        $list=Db::name('quan')
+        $list['list']=Db::name('quan')
             ->where('user_id',$user_id)
             ->select();
-        foreach ($list as $k=>$v){
+        foreach ($list['list'] as $k=>$v){
             $cang=Db::name('quan_good')->where('class',2)->where('user_id',$user_id)->find();
             if (empty($cang)){
-                $list[$k]['is_cang']=0;
+                $list['list'][$k]['is_cang']=0;
             }else{
-                $list[$k]['is_cang']=1;
+                $list['list'][$k]['is_cang']=1;
             }
             $zan=Db::name('quan_good')->where('class',1)->where('user_id',$user_id)->find();
             $guan=Db::name('guan')->where('buser_id',$v['user_id'])->where('user_id',$user_id)->find();
             if (empty($guan)){
-                $list[$k]['is_guan']=0;
+                $list['list'][$k]['is_guan']=0;
             }else{
-                $list[$k]['is_guan']=1;
+                $list['list'][$k]['is_guan']=1;
             }
             if (empty($zan)){
-                $list[$k]['is_zan']=0;
+                $list['list'][$k]['is_zan']=0;
             }else{
-                $list[$k]['is_zan']=1;
+                $list['list'][$k]['is_zan']=1;
             }
-            $list[$k]['zan_count']=Db::name('quan_good')
+            $list['list'][$k]['zan_count']=Db::name('quan_good')
                 ->where('class',1)
                 ->where('quan_id',$v['quan_id'])
                 ->count('quan_id');
-            $list[$k]['cang_count']=Db::name('quan_good')
+            $list['list'][$k]['cang_count']=Db::name('quan_good')
                 ->where('class',2)
                 ->where('quan_id',$v['quan_id'])
                 ->count('quan_id');
-            $list[$k]['comment_list']=Db::name('quan_comment')
+            $list['list'][$k]['comment_list']=Db::name('quan_comment')
                 ->where('quan_id',$v['quan_id'])
                 ->order('id','desc')
                 ->limit(4)
                 ->select();
         }
+        $list['user_info']=Db::name('user')->where('user_id',$user_id)->find();
         return json($list);
     }
 
@@ -285,10 +286,10 @@ class User extends Base
      */
     public function GetUserTg($user_id)
     {
-        $list=Db::name('article')
+        $list['list']=Db::name('article')
             ->where('user_id',$user_id)
             ->select();
-        foreach ($list as $k=>$v){
+        foreach ($list['list'] as $k=>$v){
             $where=[
                 'user_id'=>$user_id,
             ];
@@ -298,25 +299,32 @@ class User extends Base
             $where['class']=2;
             $cang=Db::name('article_good')->where($where)->find();
             if (empty($zan)){
-                $list[$k]['is_zan']=0;
+                $list['list'][$k]['is_zan']=0;
             }else{
-                $list[$k]['is_zan']=1;
+                $list['list'][$k]['is_zan']=1;
             }
             if (empty($cang)){
-                $list[$k]['is_cang']=0;
+                $list['list'][$k]['is_cang']=0;
             }else{
-                $list[$k]['is_cang']=1;
+                $list['list'][$k]['is_cang']=1;
             }
 
-            $list[$k]['comment_count']=Db::name('article_comment')
+            $list['list'][$k]['comment_count']=Db::name('article_comment')
                 ->where('article_id',$v['id'])
                 ->count('id');
-            $list[$k]['zan_count']=Db::name('article_good')
+            $list['list'][$k]['zan_count']=Db::name('article_good')
                 ->where(['article_id'=>$v['id'],'class'=>1])
                 ->count('id');
 
+            $list['list'][$k]['comment_list']=Db::name('article_comment')
+                ->where('article_id',$v['id'])
+                ->order('id','desc')
+                ->limit(3)
+                ->select();
+
 
         }
+        $list['user_info']=Db::name('user')->where('user_id',$user_id)->find();
         return json($list);
     }
     
