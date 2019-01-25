@@ -108,11 +108,22 @@ class Article extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetArticleInfo($id)
+    public function GetArticleInfo($id,$user_id)
     {
         //添加点击量
         Db::name('article')->where('id',$id)->setInc('click');
         $info=Db::name('article')->where('id',$id)->find();
+        //评论
+        $info['comment_list']=Db::name('article_comment')
+            ->where('article_id',$info['id'])
+            ->order('id','desc')
+            ->select();
+        //点赞
+        $info['is_zan']=Db::name('article_good')->where([
+            'user_id'=>$user_id,
+            'class'=>1,
+            'article_id'=>$info['id'],
+        ])->value('id') ? 1:0;
         return json($info);
     }
 
