@@ -124,6 +124,10 @@ class Article extends Base
             'class'=>1,
             'article_id'=>$info['id'],
         ])->value('id') ? 1:0;
+        $info['zan_count']=Db::name('article_good')->where([
+            'class'=>1,
+            'article_id'=>$info['id'],
+        ])->count('id');
         return json($info);
     }
 
