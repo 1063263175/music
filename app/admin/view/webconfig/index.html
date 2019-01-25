@@ -59,6 +59,38 @@
         </div>
       </div>
 
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">砍价时间</label>
+        <div class="layui-input-inline" style="max-width: 600px">
+          <input name="kanjiatime" lay-verify="pass" placeholder="单位小时" autocomplete="off" class="layui-input" type="text" value="{$web_config.kanjiatime}">
+        </div>
+        <div class="layui-form-mid layui-word-aux">单位小时</div>
+      </div>
+
+
+      <div class="layui-form-item">
+				<label class="layui-form-label">砍价最低额度</label>
+				<div class="layui-input-inline">
+          <input name="kanjiazuidi" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input" type="text" value={$web_config.kanjiazuidi} >
+         
+
+				</div>
+				<label class="layui-form-label">VIP年费金额</label>
+				<div class="layui-input-inline">
+					<input name="vipmoney" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input" type="text" value={$web_config.vipmoney} >
+				</div>
+      </div>
+      
+      <div class="layui-form-item">
+        <label class="layui-form-label">活动规则</label>
+        <div class="layui-input-block" style="max-width: 600px">
+          <textarea placeholder="请输入内容" class="layui-textarea" name="huodongguize">{$web_config.huodongguize}</textarea>
+        </div>
+      </div>
+
+
+
       <div class="layui-form-item">
         <label class="layui-form-label">上传类型</label>
         <div class="layui-input-inline" style="max-width: 600px">

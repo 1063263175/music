@@ -42,6 +42,13 @@
         </div>
 
         <div class="layui-form-item">
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-block" style="max-width:600px;">
+                <input name="add_time" lay-verify="time" id="add_time" placeholder="请输入" class="layui-input" type="text" {notempty name="$cate.add_time"}value="{$cate.add_time|date='Y-m-d H:i:s',###}"{/notempty}>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
             <label class="layui-form-label">截止时间</label>
             <div class="layui-input-block" style="max-width:600px;">
                 <input name="kai_time" lay-verify="time" id="time" placeholder="请输入" class="layui-input" type="text" {notempty name="$cate.kai_time"}value="{$cate.kai_time|date='Y-m-d H:i:s',###}"{/notempty}>
@@ -66,6 +73,16 @@
             <label class="layui-form-label">内容</label>
             <div class="layui-input-block" style="max-width:500px;">
                 <textarea placeholder="请输入内容" class="layui-textarea" name="content">{notempty name="$cate.content"}{$cate.content}{/notempty}</textarea>
+            </div>
+        </div>
+
+        <div class="layui-upload" id="upload-thumb">
+            <label class="layui-form-label">封面图</label>
+            <button type="button" class="layui-btn" id="thumb">上传图片</button>
+            <div class="layui-upload-list">
+                <label class="layui-form-label"></label>
+                <img class="layui-upload-img" id="demo1" width="150" height="150" {notempty name="$article.thumb"}src="{$article.thumb|geturl}"{/notempty}>{notempty name="$article.thumb"}<input type="hidden" name="thumb" value="{$article.thumb}">{/notempty}
+                <p id="demoText"></p>
             </div>
         </div>
 
@@ -136,6 +153,47 @@
             laydate.render({
                 elem: '#time' //指定元素
                 ,type: 'datetime'
+            });
+        });
+    </script>
+    <script>
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+
+            //执行一个laydate实例
+            laydate.render({
+                elem: '#add_time' //指定元素
+                ,type: 'datetime'
+            });
+        });
+    </script>
+
+    <script>
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '#thumb' //绑定元素
+                ,url: "{:url('common/upload')}" //上传接口
+                ,data:{use:'music_thumb'}
+                ,done: function(res){
+                    //上传完毕回调
+                    if(res.code == 2) {
+                        $('#demo1').attr('src',res.src);
+                        $('#upload-thumb').append('<input type="hidden" name="thumb_path" value="'+ res.src +'">');
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                }
+                ,error: function(){
+                    //请求异常回调
+                    //演示失败状态，并实现重传
+                    var demoText = $('#demoText');
+                    demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                    demoText.find('.demo-reload').on('click', function(){
+                        uploadInst.upload();
+                    });
+                }
             });
         });
     </script>

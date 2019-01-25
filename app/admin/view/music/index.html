@@ -54,6 +54,7 @@
           <th>时间</th>
           <th>地点</th>
           <th>置顶</th>
+          <th>砍价</th>
           <!--<th>审核</th>-->
           <th>操作</th>
         </tr> 
@@ -68,6 +69,7 @@
           <td>{$vo.time|date="Y-m-d H:i",###}</td>
           <td>{$vo.site}</td>
           <td><a href="javascript:;" style="font-size:18px;" class="is_top" data-id="{$vo.music_id}" data-val="{$vo.is_top}">{eq name="vo.is_top" value="1"}<i class="fa fa-toggle-on"></i>{else /}<i class="fa fa-toggle-off"></i>{/eq}</a></td>
+          <td><a href="javascript:;" style="font-size:18px;" class="is_bar" data-id="{$vo.music_id}" data-val="{$vo.is_bar}">{eq name="vo.is_bar" value="1"}<i class="fa fa-toggle-on"></i>{else /}<i class="fa fa-toggle-off"></i>{/eq}</a></td>
           <!--<td><a href="javascript:;" style="font-size:18px;" class="status" data-id="" data-val="{$vo.status}">{eq name="vo.status" value="1"}<i class="fa fa-toggle-on"></i>{else /}<i class="fa fa-toggle-off"></i>{/eq}</a></td>-->
           <td class="operation-menu">
             <div class="layui-btn-group">
@@ -126,8 +128,7 @@
           }
         }
       })
-
-      function top(){
+       function top(){
         if(val == 1){
           i.attr("class","fa fa-toggle-off");
           the.attr('data-val',0);
@@ -138,7 +139,39 @@
       }
     })
 
-
+   $('.is_bar').click(function(){
+      var val = $(this).attr('data-val');
+      var id = $(this).attr('data-id');
+      var i = $(this).find('i');
+      var the = $(this);
+      if(val == 1){
+        var is_bar = 0;
+      } else {
+        var is_bar = 1;
+      }
+      $.ajax({
+        type:"post",
+        url:"{:url('admin/music/is_bar')}",
+        data:{is_bar:is_bar,id:id},
+        success:function(res){
+          
+          if(res.code == 1) {
+            top();
+          } else {
+            layer.msg(res.msg);
+          }
+        }
+      })
+       function top(){
+        if(val == 1){
+          i.attr("class","fa fa-toggle-off");
+          the.attr('data-val',0);
+        } else {
+          i.attr("class","fa fa-toggle-on");
+          the.attr('data-val',1);
+        }
+      }
+    })
    /* $('.status').click(function(){
       var val = $(this).attr('data-val');
       var id = $(this).attr('data-id');

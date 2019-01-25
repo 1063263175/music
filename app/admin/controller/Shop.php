@@ -41,6 +41,7 @@ class Shop extends Permissions
                     $this->error('提交失败：' . $validate->getError());
                 }
                 $post['kai_time']=strtotime($post['kai_time']);
+                $post['add_time']=strtotime($post['add_time']);
                 //验证菜单是否存在
 /*                $cate = Db->where('id',$id)->find();
                 if(empty($cate)) {
@@ -78,7 +79,7 @@ class Shop extends Permissions
                 if (!$validate->check($post)) {
                     $this->error('提交失败：' . $validate->getError());
                 }
-                $post['add_time']=time();
+                $post['add_time']=strtotime($post['add_time']);
                 $post['kai_time']=strtotime($post['kai_time']);
                 if(false == Db::name('jiang')->insert($post)) {
                     return $this->error('添加失败');

@@ -74,6 +74,7 @@
             <th>积分</th>
             <th>卡券</th>
             <th>级别</th>
+            <th>到期时间</th>
             <th>操作</th>
         </tr>
         </thead>
@@ -81,7 +82,7 @@
         {volist name="list" id="vo"}
         <tr>
             <td>{$vo.user_id}</td>
-            <td>{$vo.nickname}</td>
+            <td>{if condition="$vo.nickname neq null" }{$vo.nickname}{else}匿名{/if}</td>
             <td>{if condition="$vo.gender eq 1"}男{else}女{/if}</td>
             <td>{$vo.country}</td>
             <td>{$vo.province}</td>
@@ -89,7 +90,8 @@
             <td>{$vo.balance}</td>
             <td>{$vo.integral}</td>
             <td>{$vo.coupon}</td>
-            <td>{$vo.level}</td>
+            <td>{if condition="$vo.level eq 1" }vip会员{else}普通会员{/if}</td>
+           <td>{if condition="$vo.endtime eq 0" }{else}{$vo.endtime|date='y-m-d',###}{/if}</td>
             <td><a href="{:url('admin/user/publish',['user_id'=>$vo.user_id])}" class="layui-btn layui-btn-xs a_menu layui-btn-primary" style="margin-right: 0;font-size:12px;"><i class="layui-icon"></i></a></td>
         </tr>
         {/volist}

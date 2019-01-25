@@ -111,7 +111,17 @@ class Music extends Permissions
             }
         }
     }
-
+    public function is_bar()
+    {
+        if($this->request->isPost()){
+            $post = $this->request->post();
+            if(false == Db::name('music')->where('music_id',$post['id'])->update(['is_bar'=>$post['is_bar']])) {
+                return $this->error('设置失败');
+            } else {
+                return $this->success('设置成功','admin/music/index');
+            }
+        }
+    }
     public function delete()
     {
         if($this->request->isAjax()) {
