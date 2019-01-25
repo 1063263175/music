@@ -119,7 +119,60 @@ class Index extends Base
        
 
     }
+  //砍价商品列表
+ public function GetMusicPageListbar($keyword='',$year='',$user_id=0,$class=1,$page = "1", $limit = "20",$is_top="0", $sort = " mu.music_id ", $desc = "desc")
+    {
+            if (empty($keyword)){
+                $key='';
+            }else{
+                $key['mu.name']=['like','%' . $keyword . '%'];
+            }
+            if (!empty($year)){
+                $ye['mu.create_time']=['between time',[$year . '-1-1',$year . '-12-31']];
+            }else{
+                $ye='';
+            }
+        
+            $where=[
+                 'mu.is_bar'=>1,
+            ];
+            $list = Db::name('music')
+                ->alias('mu')
+                ->where($where)
+                ->where($key)
+                ->where($ye)
+                ->order($sort,$desc)
+                ->page($page,$limit)
+                ->select();
+            foreach ($list as $k=>$v){
+                $zan=GetMusicGood($user_id,$v['music_id'],1);
+                $cang=GetMusicGood($user_id,$v['music_id'],2);
+                //获取评论数量
+                //dump($this->GetCommentCount($v['music_id']));die;
+                $list[$k]['comment_count']=$this->GetCommentCount($v['music_id'],'0');
+                //获取点赞数量
+                $list[$k]['zan_count']=Db::name('good')
+                    ->where('music_id',$v['music_id'])
+                    ->count('music_id');
+                //获取前三条评论
+                $list[$k]['comment_list']=$this->GetCommentList($v['music_id'],1,3,'0');
+                if (empty($zan)){
+                    $list[$k]['is_zan']=0;
+                }else{
+                    $list[$k]['is_zan']=1;
+                }
+                if (empty($cang)){
+                    $list[$k]['is_cang']=0;
+                }else{
+                    $list[$k]['is_cang']=1;
+                }
+            }
 
+            //dump($list);
+            return json($list);
+       
+
+    }
     /**
      * 添加评论
      * @param $user_id
@@ -305,7 +358,7 @@ class Index extends Base
             return ['count'=>$num];
         }
     }
-
+   
     /**
      * 上传附件方法
      * @param string $module
@@ -362,7 +415,7 @@ class Index extends Base
         }
     }
 
-
+ 
 
 
 }

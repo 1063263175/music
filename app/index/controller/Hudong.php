@@ -49,9 +49,15 @@ class Hudong extends Base
      */
     public function GetQuanList($user_id,$page=1, $pageLimit=20)
     {
+        $user_ids=Db::name('guan')->where('user_id',$user_id)->field('buser_id')->select();
+        foreach ($user_ids as $k=>$v){
+            $ids[$k]=$v['buser_id'];
+        }
+        $wh['qu.user_id']=['not in',$ids];
         $list=Db::name('quan')
             ->alias('qu')
             ->join('tplay_user tu','qu.user_id=tu.user_id','left')
+            ->where($wh)
             ->page($page,$pageLimit)
             ->order('qu.quan_id','desc')
             ->select();
@@ -107,13 +113,17 @@ class Hudong extends Base
      * @param $status 0取消1加入
      * @return \think\response\Json
      */
-    public function SetQuanGood($status=1, $user_id, $quan_id, $class)
+    public function SetQuanGood($status=1, $user_id, $music_id, $class)
     {
+
+        //给前端换名
+        $quan_id=$music_id;
         $vali=new Validate([
             ['user_id','require','参数错误'],
             ['quan_id','require','参数错误'],
             ['class','require','参数错误'],
         ]);
+
         $info=[
             'user_id'=>$user_id,
             'quan_id'=>$quan_id,
@@ -148,7 +158,7 @@ class Hudong extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetQuanInfo($quan_id)
+    public function GetQuanInfo($quan_id,$user_id)
     {
         //点击量
         Db::name('quan')->where('quan_id',$quan_id)->setInc('click');
@@ -160,18 +170,27 @@ class Hudong extends Base
         //朋友圈的点赞数量
         $info['zan_count']=Db::name('quan_good')
             ->where('quan_id',$info['quan_id'])
-            ->where('user_id',$info['user_id'])
+            /*->where('user_id',$info['user_id'])*/
             ->where('class',1)
             ->count('id');
         $info['cang_count']=Db::name('quan_good')
             ->where('quan_id',$info['quan_id'])
-            ->where('user_id',$info['user_id'])
+            /*->where('user_id',$info['user_id'])*/
             ->where('class',2)
             ->count('id');
         $info['comment_count']=Db::name('quan_comment')
             ->where('quan_id',$info['quan_id'])
             ->count('id');
-
+        $zan=Db::name('quan_good')
+            ->where('class',1)
+            ->where('quan_id',$info['quan_id'])
+            ->where('user_id',$user_id)
+            ->find();
+        if (empty($zan)){
+            $info['is_zan']=0;
+        }else{
+            $info['is_zan']=1;
+        }
         return json($info);
     }
 
@@ -294,6 +313,46 @@ class Hudong extends Base
             ->page($page,$pagelimit)
             ->order('quan_id','desc')
             ->select();
+        foreach ($list as $k=>$v){
+            $cang=Db::name('quan_good')->where('class',2)->where('user_id',$user_id)->find();
+            if (empty($cang)){
+                $list[$k]['is_cang']=0;
+            }else{
+                $list[$k]['is_cang']=1;
+            }
+            $zan=Db::name('quan_good')
+                ->where('class',1)
+                ->where('quan_id',$v['quan_id'])
+                ->where('user_id',$user_id)
+                ->find();
+            $guan=Db::name('guan')
+                ->where('buser_id',$v['user_id'])
+                ->where('user_id',$user_id)
+                ->find();
+            if (empty($guan)){
+                $list[$k]['is_guan']=0;
+            }else{
+                $list[$k]['is_guan']=1;
+            }
+            if (empty($zan)){
+                $list[$k]['is_zan']=0;
+            }else{
+                $list[$k]['is_zan']=1;
+            }
+            $list[$k]['zan_count']=Db::name('quan_good')
+                ->where('class',1)
+                ->where('quan_id',$v['quan_id'])
+                ->count('quan_id');
+            $list[$k]['cang_count']=Db::name('quan_good')
+                ->where('class',2)
+                ->where('quan_id',$v['quan_id'])
+                ->count('quan_id');
+            $list[$k]['comment_list']=Db::name('quan_comment')
+                ->where('quan_id',$v['quan_id'])
+                ->order('id','desc')
+                ->limit(4)
+                ->select();
+        }
         return json($list);
     }
 

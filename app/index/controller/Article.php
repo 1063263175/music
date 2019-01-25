@@ -172,8 +172,10 @@ class Article extends Base
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
-    public function SetArticleGood($status, $article_id, $user_id, $class)
+    public function SetArticleGood($status, $music_id, $user_id, $class)
     {
+        //给前端换个变量名
+        $article_id=$music_id;
         $info=[
             'article_id'=>$article_id,
             'user_id'=>$user_id,

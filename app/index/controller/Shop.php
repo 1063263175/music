@@ -248,10 +248,17 @@ class Shop extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetJiangList($page=1,$pagelimit=20)
+    public function GetJiangList($page=1,$pagelimit=20,$status='all')
     {
+        if ($status=='all'){
+            $where='';
+        }else{
+            $where['status']=$status;
+        }
         $list=Db::name('jiang')
             ->page($page,$pagelimit)
+            ->where($where)
+            /*->where(time().'<kai_time')*/
             ->order('jiang_id','desc')
             ->select();
         return json($list);
@@ -292,6 +299,22 @@ class Shop extends Base
     }
 
 
+    public function yikaijiang()
+    {
+        
+        $list=Db::name('jiang')
+            ->alias('j')
+            ->join('tplay_jiang_res jr','j.jiang_id=jr.jiang_id','left')
+            ->join('tplay_jiang_code jc','jc.jiang_code=jr.jiang_code','left')
+            ->join('tplay_user tu','tu.user_id=jc.user_id','left')
+            ->where('j.status',1)
+            ->field('j.kai_time,j.old_money,j.title,j.thumb_path,jr.jiang_code,tu.head_img')
+            ->limit(1)
+            ->select();
+       
+       // dump($list);
+        return json($list);
+    }
 
 
 }
