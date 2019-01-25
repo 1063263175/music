@@ -243,14 +243,25 @@ class User extends Base
             ->where('user_id',$user_id)
             ->select();
         foreach ($list['list'] as $k=>$v){
-            $cang=Db::name('quan_good')->where('class',2)->where('user_id',$user_id)->find();
+            $cang=Db::name('quan_good')
+                ->where('class',2)
+                ->where('quan_id',$v['quan_id'])
+                ->where('user_id',$user_id)
+                ->find();
             if (empty($cang)){
                 $list['list'][$k]['is_cang']=0;
             }else{
                 $list['list'][$k]['is_cang']=1;
             }
-            $zan=Db::name('quan_good')->where('class',1)->where('user_id',$user_id)->find();
-            $guan=Db::name('guan')->where('buser_id',$v['user_id'])->where('user_id',$user_id)->find();
+            $zan=Db::name('quan_good')
+                ->where('class',1)
+                ->where('quan_id',$v['quan_id'])
+                ->where('user_id',$user_id)
+                ->find();
+            $guan=Db::name('guan')
+                ->where('buser_id',$v['user_id'])
+                ->where('user_id',$user_id)
+                ->find();
             if (empty($guan)){
                 $list['list'][$k]['is_guan']=0;
             }else{
@@ -292,6 +303,7 @@ class User extends Base
         foreach ($list['list'] as $k=>$v){
             $where=[
                 'user_id'=>$user_id,
+                'article_id'=>$v['id'],
             ];
             $where['article_id']=$v['id'];
             $where['class']=1;
