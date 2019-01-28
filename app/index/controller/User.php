@@ -226,8 +226,8 @@ class User extends Base
     {
         $list=Db::name('guan')
             ->alias('gu')
-            ->join('tplay_user tu','tu.user_id=gu.user_id')
-            ->where('gu.buser_id',$user_id)
+            ->join('tplay_user tu','tu.user_id=gu.buser_id','left')
+            ->where('gu.user_id',$user_id)
             ->select();
         return json($list);
     }
@@ -339,5 +339,25 @@ class User extends Base
         $list['user_info']=Db::name('user')->where('user_id',$user_id)->find();
         return json($list);
     }
+
+
+    /**
+     * 修改昵称
+     * @param $user_id
+     * @param $user_name
+     * @return \think\response\Json
+     * @throws \think\Exception
+     * @throws \think\exception\PDOException
+     */
+    public function SetUserName($user_id, $user_name)
+    {
+        $info=Db::name('user')->where('user_id',$user_id)->update(['nickname'=>$user_name]);
+        if ($info){
+            return $this->asuccess('修改成功');
+        }else{
+            return $this->aerror('修改失败');
+        }
+    }
+
     
 }

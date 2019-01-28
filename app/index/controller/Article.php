@@ -227,22 +227,52 @@ class Article extends Base
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function GetGoodPageList($class=1, $user_id, $page=1, $pagelimit=20, $sort='id', $desc='desc')
+    public function GetGoodPageList($cate,$class=1, $user_id, $page=1, $pagelimit=20, $sort='id', $desc='desc')
     {
         $where=[
-            'class'=>$class,
-
+            'ag.class'=>$class,
+            'ta.article_cate_id'=>$cate,
             //'article_id'=>$article_id,
-            'user_id'=>$user_id,
+            'ag.user_id'=>$user_id,
         ];
         $list=Db::name('article_good')
             ->alias('ag')
-            ->join('tplay_article ta','ta.id=ag.article_id','left')
+            ->join('tplay_article ta','ta.id=ag.article_id','right')
             ->where($where)
             ->page($page,$pagelimit)
             ->order($sort,$desc)
             ->field('ta.*,ag.class')
             ->select();
+        foreach ($list as $k=>$v){
+            unset($where);
+            $where=[
+              'user_id'=>$user_id,
+            ];
+            $where['article_id']=$v['id'];
+            $where['class']=1;
+            $zan=Db::name('article_good')->where($where)->find();
+            $where['class']=2;
+            $cang=Db::name('article_good')->where($where)->find();
+            if (empty($zan)){
+                $list[$k]['is_zan']=0;
+            }else{
+                $list[$k]['is_zan']=1;
+            }
+            if (empty($cang)){
+                $list[$k]['is_cang']=0;
+            }else{
+                $list[$k]['is_cang']=1;
+            }
+
+            $list[$k]['comment_count']=Db::name('article_comment')
+                ->where('article_id',$v['id'])
+                ->count('id');
+            $list[$k]['zan_count']=Db::name('article_good')
+                ->where(['article_id'=>$v['id'],'class'=>1])
+                ->count('id');
+
+
+        }
         return json($list);
     }
 

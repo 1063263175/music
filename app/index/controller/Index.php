@@ -212,14 +212,14 @@ class Index extends Base
         ];
         if ($status == 0){
             //取消
-            if (Db::name('good')->where($info)->delete()!==false){
+            if (Db::name('good')->where($info)->delete()){
                 return json(['res'=>1]);
             }else{
                 return json(['res'=>0]);
             }
         }elseif ($status == 1){
             //加入
-            if (Db::name('good')->insert($info)>0){
+            if (Db::name('good')->insertGetId($info)>0){
                 return json(['res'=>1]);
             }else{
                 return json(['res'=>0]);
