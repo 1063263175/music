@@ -34,7 +34,7 @@ class User extends Base
         curl_close($curl);
         //dump(json_decode($res, true));
         $res=json_decode($res, true);
-
+//76556
         //$res['openid']=21121;
         if (!empty($res['openid'])){
             $user=Db::name('user')->where('openid',$res['openid'])->field('user_id')->find();
